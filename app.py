@@ -11,6 +11,11 @@ RESPONSE_LOG_FILE = "responses_log.xlsx"
 def index():
     return "<h3>✅ Serverul Flask rulează. Accesează /raport/aprobare pentru a vota.</h3>"
 
+# ✅ Nou: endpoint pentru ping/healthcheck
+@app.route("/healthcheck")
+def healthcheck():
+    return "OK", 200
+
 @app.route("/raport/aprobare")
 def aprobare():
     approval_id_param = request.args.get("id", "")
