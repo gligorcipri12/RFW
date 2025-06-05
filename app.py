@@ -7,9 +7,9 @@ app = Flask(__name__)
 
 RESPONSE_LOG_FILE = "responses_log.xlsx"
 
-# Creare fișier log dacă nu există
-if not os.path.exists(RESPONSE_LOG_FILE):
-    pd.DataFrame(columns=["timestamp", "approval_id", "response", "user_email"]).to_excel(RESPONSE_LOG_FILE, index=False)
+@app.route("/")
+def index():
+    return "<h3>✅ Serverul Flask rulează. Accesează /raport/aprobare pentru a vota.</h3>"
 
 @app.route("/raport/aprobare")
 def aprobare():
@@ -18,7 +18,12 @@ def aprobare():
     response = request.args.get("response", "no_action")
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    df_log = pd.read_excel(RESPONSE_LOG_FILE)
+    # Verificare/creare fișier
+    try:
+        df_log = pd.read_excel(RESPONSE_LOG_FILE)
+    except Exception:
+        df_log = pd.DataFrame(columns=["timestamp", "approval_id", "response", "user_email"])
+        df_log.to_excel(RESPONSE_LOG_FILE, index=False)
 
     deja_votat = df_log[
         (df_log["approval_id"] == approval_id_param) &
@@ -53,6 +58,4 @@ def aprobare():
     """
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))  # Render setează PORT automat
-    app.run(host="0.0.0.0", port=port)
-
+    app.run(host="0.0.0.0", port=10000)
